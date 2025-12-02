@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,7 +39,7 @@ public final class LambdaFilter extends JFrame {
 
     @Serial
     private static final long serialVersionUID = 1760990730218643730L;
-    private static final String REGEXSEP = " |\n";
+    private static final String REGEXSEP = "( |\n)+";
 
     private enum Command {
         /**
@@ -48,13 +49,16 @@ public final class LambdaFilter extends JFrame {
         LOWERCASE("Convert to lowercase", s -> s.toLowerCase(Locale.getDefault())),
         COUNTCHARS("Count characters", s -> String.valueOf(s.toCharArray().length)),
         COUNTLINES("Count lines", s -> String.valueOf(s.lines().count())),
-        ALPHABETICAL("Sort alphabetically", s -> List.of(s.split(REGEXSEP)).stream().sorted(String::compareTo)
-            .reduce("", (s1, s2) -> String.join(" ", s1, s2))),
-        WORDCOUNT("Count appearances of each word", s -> List.of(s.split(REGEXSEP)).stream().distinct()
-            .reduce("", (s1, s2) -> 
-            String.join(" ", s1, 
-            String.join(" -> ", s2, 
-            String.valueOf(List.of(s.split(REGEXSEP)).stream().filter(n -> n.equals(s2)).count())))));
+        ALPHABETICAL("Sort alphabetically", s -> List.of(s.split(REGEXSEP)).stream()
+            .sorted(String::compareTo).collect(Collectors.joining(" "))
+            ),
+        WORDCOUNT("Count appearances of each word", k -> List.of(k.split(REGEXSEP)).stream()
+            .distinct()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet().stream()
+            .map(s -> s.getKey() + " -> " + s.getValue())
+            .collect(Collectors.joining(" "))
+        );
         private final String commandName;
         private final Function<String, String> fun;
 
