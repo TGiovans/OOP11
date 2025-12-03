@@ -3,16 +3,23 @@ package it.unibo.oop.workers02;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiThreadedSumMatrix implements SumMatrix {
+/**
+ * Class to sum all elements of a matrix using multithreading.
+ */
+public final class MultiThreadedSumMatrix implements SumMatrix {
 
-    final int workCount;
+    private final int workCount;
 
-    public MultiThreadedSumMatrix(int n) {
+    /**
+     *
+     * @param n amount of threads.
+     */
+    public MultiThreadedSumMatrix(final int n) {
         this.workCount = n;
     }
 
     @Override
-    public double sum(double[][] matrix) {
+    public double sum(final double[][] matrix) {
         final int size = matrix.length > 0 ? matrix.length * matrix[0].length : 0;
         final int split = size / this.workCount + size % workCount;
         final List<Worker> workers = new ArrayList<>(workCount);
@@ -32,7 +39,7 @@ public class MultiThreadedSumMatrix implements SumMatrix {
                 throw new IllegalStateException(e);
             }
         }
-        
+
         return sum;
     }
 
@@ -63,7 +70,7 @@ public class MultiThreadedSumMatrix implements SumMatrix {
         @SuppressWarnings("PMD.SystemPrintln")
         public synchronized void run() {
             System.out.println("Working from position " + startpos + " to position " + (startpos + nelem - 1));
-            for (int i = startpos; i < matrix.length*matrix[0].length && i < startpos + nelem; i++) {
+            for (int i = startpos; i < matrix.length * matrix[0].length && i < startpos + nelem; i++) {
                 this.res += this.matrix[i / matrix[0].length][i % matrix[0].length];
             }
         }
@@ -76,7 +83,5 @@ public class MultiThreadedSumMatrix implements SumMatrix {
         public synchronized double getResult() {
             return this.res;
         }
-
     }
-    
 }
