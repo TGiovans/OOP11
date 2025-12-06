@@ -11,7 +11,6 @@ public final class MultiThreadedSumMatrix implements SumMatrix {
     private final int workCount;
 
     /**
-     *
      * @param n amount of threads.
      */
     public MultiThreadedSumMatrix(final int n) {
@@ -23,7 +22,6 @@ public final class MultiThreadedSumMatrix implements SumMatrix {
         final int size = matrix.length > 0 ? matrix.length * matrix[0].length : 0;
         final int split = size / this.workCount + size % workCount;
         final List<Worker> workers = new ArrayList<>(workCount);
-        System.out.println(split + " split per thread check that");
         for (int start = 0; start < size; start += split) {
             workers.add(new Worker(matrix, start, split));
         }
@@ -61,7 +59,7 @@ public final class MultiThreadedSumMatrix implements SumMatrix {
          */
         Worker(final double[][] list, final int startpos, final int nelem) {
             super();
-            this.matrix = list;
+            this.matrix = list.clone();
             this.startpos = startpos;
             this.nelem = nelem;
         }
